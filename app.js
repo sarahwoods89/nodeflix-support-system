@@ -1,3 +1,4 @@
+let lastReply = null;
 const express = require('express');
 const app = express();
 const grpc = require('@grpc/grpc-js');
@@ -20,7 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('index', { bot_reply: null });
+  res.render('index', { bot_reply: lastReply });
+  lastReply = null; // reset after displaying
 });
 
 app.post('/chat', (req, res) => {
@@ -28,9 +30,11 @@ app.post('/chat', (req, res) => {
 
   client.SendMessage({ user_message: userMessage }, (err, response) => {
     if (err) {
-      return res.send("Error: " + err.message);
+      lastReply = "Oops, something went wrong: " + err.message;
+    } else {
+      lastReply = response.bot_reply;
     }
-    res.render('index', { bot_reply: response.bot_reply });
+    res.redirect('/');
   });
 });
 
