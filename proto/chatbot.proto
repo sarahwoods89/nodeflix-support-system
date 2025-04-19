@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package chatbot;
+
+service ChatbotService {
+  rpc SendMessage (ChatRequest) returns (ChatResponse);
+}
+
+message ChatRequest {
+  string user_message = 1;
+}
+
+message ChatResponse {
+  string bot_reply = 1;
+}
