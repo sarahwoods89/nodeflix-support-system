@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ticketing;
+
+service TicketingService {
+  rpc CreateTicket (TicketRequest) returns (stream TicketUpdate);
+}
+
+message TicketRequest {
+  string user_message = 1;
+}
+
+message TicketUpdate {
+  string status = 1;   // e.g. "Ticket received", "Assigned to agent", etc.
+  string timestamp = 2;
+}
