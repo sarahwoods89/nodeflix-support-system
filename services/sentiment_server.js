@@ -3,15 +3,15 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
 // Load sentiment.proto
-const PROTO_PATH = path.join(__dirname, '../proto/sentiment.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const sentimentProto = grpc.loadPackageDefinition(packageDefinition).sentiment;
+const sentimentProtoPath = path.join(__dirname, '..', 'proto', 'sentiment.proto');
+const sentimentDef = protoLoader.loadSync(sentimentProtoPath);
+const sentimentProto = grpc.loadPackageDefinition(sentimentDef).sentiment;
 
 // Simulated tone analyzer
 function analyzeTone(call, callback) {
   const msg = call.request.message.toLowerCase();
-
   let tone = "neutral";
+
   if (msg.includes("angry") || msg.includes("refund") || msg.includes("not happy")) {
     tone = "angry";
   } else if (msg.includes("thanks") || msg.includes("great")) {

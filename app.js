@@ -1,13 +1,14 @@
-let lastReply = null;
 const express = require('express');
 const app = express();
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
-const PROTO_PATH = path.join(__dirname, 'proto', 'chatbot.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const chatbotProto = grpc.loadPackageDefinition(packageDefinition).chatbot;
+let lastReply = null;
+
+const chatbotProtoPath = path.join(__dirname, 'proto', 'chatbot.proto');
+const chatbotDef = protoLoader.loadSync(chatbotProtoPath);
+const chatbotProto = grpc.loadPackageDefinition(chatbotDef).chatbot;
 
 const client = new chatbotProto.ChatbotService(
   'localhost:50051',
@@ -22,18 +23,14 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.get('/', (req, res) => {
   res.render('index', { bot_reply: lastReply });
-  lastReply = null; // reset after displaying
+  lastReply = null;
 });
 
 app.post('/chat', (req, res) => {
   const userMessage = req.body.user_message;
 
   client.SendMessage({ user_message: userMessage }, (err, response) => {
-    if (err) {
-      lastReply = "Oops, something went wrong: " + err.message;
-    } else {
-      lastReply = response.bot_reply;
-    }
+    lastReply = err ? "Oops, something went wrong: " + err.message : response.bot_reply;
     res.redirect('/');
   });
 });

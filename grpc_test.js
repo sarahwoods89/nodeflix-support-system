@@ -2,9 +2,9 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
-const PROTO_PATH = path.join(__dirname, 'proto', 'chatbot.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const chatbotProto = grpc.loadPackageDefinition(packageDefinition).chatbot;
+const chatbotProtoPath = path.join(__dirname, 'proto', 'chatbot.proto');
+const chatbotDef = protoLoader.loadSync(chatbotProtoPath);
+const chatbotProto = grpc.loadPackageDefinition(chatbotDef).chatbot;
 
 const client = new chatbotProto.ChatbotService(
   'localhost:50051',

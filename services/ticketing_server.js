@@ -3,15 +3,14 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
 // Load ticketing.proto
-const PROTO_PATH = path.join(__dirname, '../proto/ticketing.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const ticketingProto = grpc.loadPackageDefinition(packageDefinition).ticketing;
+const ticketingProtoPath = path.join(__dirname, '..', 'proto', 'ticketing.proto');
+const ticketingDef = protoLoader.loadSync(ticketingProtoPath);
+const ticketingProto = grpc.loadPackageDefinition(ticketingDef).ticketing;
 
 function createTicket(call) {
   const message = call.request.user_message;
   console.log("🎫 Ticket created for:", message);
 
-  // Simulate streaming status updates
   const updates = [
     { status: "Ticket received", timestamp: new Date().toISOString() },
     { status: "Assigned to support agent", timestamp: new Date().toISOString() },
@@ -28,7 +27,7 @@ function createTicket(call) {
       call.end();
       clearInterval(interval);
     }
-  }, 1000); // stream every 1 second
+  }, 1000);
 }
 
 // Start gRPC server
