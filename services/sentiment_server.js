@@ -18,7 +18,7 @@ function analyzeTone(call, callback) {
     tone = "happy";
   }
 
-  console.log("📥 Received for tone analysis:", msg);
+  console.log("✅ Received for tone analysis:", msg);
   callback(null, { tone });
 }
 
@@ -29,12 +29,12 @@ function main() {
 
   server.bindAsync('127.0.0.1:50052', grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {
-      console.error("❌ Failed to bind sentiment service:", err);
+      console.error("Failed to bind sentiment service:", err);
       return;
     }
 
     server.start();
-    console.log(`🔵 Sentiment Analysis Service running on port ${port}`);
+    console.log(`Sentiment Analysis Service running on port ${port}`);
   });
 }
 

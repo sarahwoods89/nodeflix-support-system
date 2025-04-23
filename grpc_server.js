@@ -6,17 +6,18 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
 // Load chatbot proto
-const chatbotProtoPath = path.join(__dirname, '..', 'proto', 'chatbot.proto');
+const chatbotProtoPath = path.resolve(__dirname, 'proto/chatbot.proto');
+console.log('Looking for chatbot.proto at:', chatbotProtoPath);
 const chatbotDef = protoLoader.loadSync(chatbotProtoPath);
 const chatbotProto = grpc.loadPackageDefinition(chatbotDef).chatbot;
 
 // Load sentiment proto
-const sentimentProtoPath = path.join(__dirname, '..', 'proto', 'sentiment.proto');
+const sentimentProtoPath = path.join(__dirname, 'proto', 'sentiment.proto');
 const sentimentDef = protoLoader.loadSync(sentimentProtoPath);
 const sentimentProto = grpc.loadPackageDefinition(sentimentDef).sentiment;
 
 // Load ticketing proto
-const ticketingProtoPath = path.join(__dirname, '..', 'proto', 'ticketing.proto');
+const ticketingProtoPath = path.join(__dirname, 'proto', 'ticketing.proto');
 const ticketingDef = protoLoader.loadSync(ticketingProtoPath);
 const ticketingProto = grpc.loadPackageDefinition(ticketingDef).ticketing;
 
@@ -27,30 +28,39 @@ const ticketingClient = new ticketingProto.TicketingService('localhost:50053', g
 // Chatbot logic
 function getBotReply(call, callback) {
   const userMsg = call.request.user_message;
-  console.log('📩 Received from user:', userMsg);
+  console.log('Received from user:', userMsg);
 
-  sentimentClient.AnalyzeTone({ text: userMsg }, (err, response) => {
+  // DEBUG LOGGING SENTIMENT CALL
+  console.log('Sending to sentiment service:', { message: userMsg });
+
+  sentimentClient.AnalyzeTone({ message: userMsg }, (err, response) => {
     if (err) {
-      console.error('❌ Error contacting Sentiment Service:', err.message);
-      return callback(null, { bot_reply: '⚠️ Sorry, I couldn’t analyze the message tone.' });
+      console.error('Error contacting Sentiment Service:', err.message);
+      return callback(null, { bot_reply: 'Sorry, I couldn’t analyze the message tone.' });
     }
 
-    const tone = response.tone;
-    console.log('🧠 Detected tone:', tone);
+    // DEBUG LOGGING SENTIMENT RESPONSE
+    console.log('Response from sentiment service:', response);
 
-    let reply = `🤖 Tone detected: ${tone}. `;
+    const tone = response.tone;
+    console.log('Detected tone:', tone);
+
+    let reply = `Tone detected: ${tone}. `;
 
     if (tone === 'angry' || tone === 'frustrated') {
-      ticketingClient.CreateTicket({ user_message: userMsg }).on('data', (ticketUpdate) => {
-        console.log("📝 Ticket update:", ticketUpdate.status);
-      }).on('end', () => {
-        reply += '📝 Your issue has been escalated. A support agent will contact you shortly.';
-        return callback(null, { bot_reply: reply });
-      }).on('error', (err) => {
-        console.error('❌ Ticketing stream error:', err.message);
-        reply += '⚠️ But I couldn’t create a ticket.';
-        return callback(null, { bot_reply: reply });
-      });
+      ticketingClient.CreateTicket({ user_message: userMsg })
+        .on('data', (ticketUpdate) => {
+          console.log("📋 Ticket update:", ticketUpdate.status);
+        })
+        .on('end', () => {
+          reply += 'Your issue has been escalated. A support agent will contact you shortly.';
+          return callback(null, { bot_reply: reply });
+        })
+        .on('error', (err) => {
+          console.error('Ticketing stream error:', err.message);
+          reply += 'But I couldn’t create a ticket.';
+          return callback(null, { bot_reply: reply });
+        });
     } else {
       reply += 'How can I assist you further?';
       return callback(null, { bot_reply: reply });
@@ -65,11 +75,11 @@ function main() {
 
   server.bindAsync('127.0.0.1:50051', grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {
-      console.error('❌ Failed to bind chatbot server:', err);
+      console.error('Failed to bind chatbot server:', err);
       return;
     }
     server.start();
-    console.log(`🤖 Chatbot Server running on port ${port}`);
+    console.log(`Chatbot Server running on port ${port}`);
   });
 }
 
