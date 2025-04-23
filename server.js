@@ -6,7 +6,7 @@ const PROTO_PATH = path.join(__dirname, 'proto', 'chatbot.proto');
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
 const chatbotProto = grpc.loadPackageDefinition(packageDefinition).chatbot;
 
-// 👇 This function handles what to do when the client sends a message
+//This function handles what to do when the client sends a message
 function sendMessage(call, callback) {
     const userMessage = call.request.user_message.toLowerCase();
     let reply;

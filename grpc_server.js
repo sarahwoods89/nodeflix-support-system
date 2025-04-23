@@ -1,4 +1,4 @@
-// 📂 services/grpc_server.js
+//services/grpc_server.js
 // This is your main chatbot server now extended to talk to the sentiment and ticketing services.
 
 const grpc = require('@grpc/grpc-js');

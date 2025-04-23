@@ -1,23 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Nodeflix Support Chatbot</title>
   <style>
-    textarea, button {
-      margin-top: 10px;
-      font-size: 16px;
+    /* Body and Layout */
+    body {
+      background-color: #141414;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
+
+    /* Chatbox Styling */
+    .chatbox {
+      background-color: #1c1c1c;
+      border: 1px solid #e50914;
+      border-radius: 10px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    h2 {
+      color: #e50914;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      resize: none;
+    }
+
+    button {
+      background-color: #e50914;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      display: block;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #b00610;
+    }
+
     .bot-reply {
-      background: #eef;
+      background: #333;
       padding: 15px;
       margin-top: 20px;
       border-radius: 8px;
+      color: white;
+    }
+
+    #netflix-intro {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(270deg, #ff005e, #fffa00, #00ffba, #0055ff, #ae00ff);
+  background-size: 1000% 1000%;
+  animation: rainbowMove 4s ease infinite, fadeOut 3s ease forwards;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes rainbowMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+    .intro-text {
+      font-size: 8rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 40px #e50914;
+      font-family: 'Arial', sans-serif;
+      animation: zoomIn 1.2s ease-out;
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
     }
   </style>
 </head>
 <body>
+  <!-- Netflix-style intro -->
+  <div id="netflix-intro">
+    <div class="intro-text">NODEFLIX</div>
+  </div>
+
+  <!-- Chat UI -->
   <div class="chatbox">
-    <h2>📼 Nodeflix Support Chatbot</h2>
+    <h2>Nodeflix Support Chatbot</h2>
     <form action="/chat" method="POST">
       <textarea name="user_message" rows="4" placeholder="Type your message..." required></textarea>
       <button type="submit">Send</button>
@@ -25,9 +129,18 @@
 
     <% if (bot_reply) { %>
       <div class="bot-reply">
-        📮 <strong>Bot:</strong> <%= bot_reply %>
+        <strong>Bot:</strong> <%= bot_reply %>
       </div>
     <% } %>
   </div>
+
+  <script>
+    setTimeout(() => {
+      const intro = document.getElementById('netflix-intro');
+      if (intro) {
+        intro.style.display = 'none';
+      }
+    }, 3000);
+  </script>
 </body>
 </html>
