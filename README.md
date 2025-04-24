@@ -25,3 +25,61 @@ A gRPC-powered customer support chatbot for **Nodeflix**, a fictional blockchain
 
 ## Project Structure
 
+nodeflix-support-system/ │ 
+├── proto/ # .proto definitions │ 
+  ├── chatbot.proto │ 
+  ├── sentiment.proto │ 
+  ├── ticketing.proto │ 
+  └── livechat.proto │ 
+├── services/ 
+# gRPC microservices │ 
+  ├── grpc_server.js
+# Main chatbot gRPC server │ 
+  ├── sentiment_server.js │ 
+  ├── ticketing_server.js │ 
+  ├── livechat_server.js │ 
+  ├── clients/ # Streaming test clients │ 
+  └── livechat_client.js │ 
+├── views/ # Express GUI (EJS templates) │ 
+  └── index.ejs │ 
+  ├── app.js # Express GUI server 
+  └── README.md
+
+  
+---
+
+## Getting Started
+
+### 1. Clone the Repo
+ 
+git clone https://github.com/your-username/nodeflix-support-system.git
+cd nodeflix-support-system
+
+### 2. Install dependencies
+
+npm install
+
+### 3. Start all services
+
+node services/sentiment_server.js
+node services/ticketing_server.js
+node services/livechat_server.js
+node services/grpc_server.js
+node app.js
+
+### 4. Test livechat for bi-directional and client scripting
+
+node clients/livechat_client.js
+
+
+Author: Sarah Woods
+Student ID: x23170662
+National College of Ireland
+Distributed Systems Coursework (2025)
+
+
+
+
+
+
+
