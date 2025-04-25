@@ -5,6 +5,17 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
+const fs = require('fs');
+
+// Function to log service events
+function logData(data) {
+  fs.appendFile('service.log', `${new Date().toISOString()} - ${data}\n`, (err) => {
+    if (err) {
+      console.error('Error writing to log:', err);
+    }
+  });
+}
+
 // Load chatbot proto
 const chatbotProtoPath = path.resolve(__dirname, 'proto/chatbot.proto');
 console.log('Looking for chatbot.proto at:', chatbotProtoPath);
@@ -32,6 +43,8 @@ function getBotReply(call, callback) {
 
   // DEBUG LOGGING SENTIMENT CALL
   console.log('Sending to sentiment service:', { message: userMsg });
+
+  logData(`Chatbot received message: ${userMsg}`);
 
   sentimentClient.AnalyzeTone({ message: userMsg }, (err, response) => {
     if (err) {

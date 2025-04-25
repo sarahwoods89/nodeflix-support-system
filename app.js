@@ -33,6 +33,18 @@ app.get('/', (req, res) => {
   res.render('index'); // ✨ Cleaner now, no need to pass `bot_reply`
 });
 
+// Basic API Key Middleware
+const API_KEY = 'supersecretapikey123'; // Hardcoded API key for demo purposes
+
+app.use((req, res, next) => {
+  const userApiKey = req.headers['api-key'];
+  if (userApiKey && userApiKey === API_KEY) {
+    next(); // Correct key: allow request
+  } else {
+    res.status(401).send('Unauthorized: Invalid API Key'); // Block access
+  }
+});
+
 // AJAX Chatbot route
 app.post('/chat', (req, res) => {
   const userMessage = req.body.user_message;

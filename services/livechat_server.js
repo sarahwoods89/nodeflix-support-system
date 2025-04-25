@@ -2,28 +2,46 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
+const fs = require('fs');
+
+// Function to log service events
+function logData(data) {
+  fs.appendFile('service.log', `${new Date().toISOString()} - ${data}\n`, (err) => {
+    if (err) {
+      console.error('Error writing to log:', err);
+    }
+  });
+}
+
 const livechatProtoPath = path.join(__dirname, '..', 'proto', 'livechat.proto');
 const livechatDef = protoLoader.loadSync(livechatProtoPath);
 const livechatProto = grpc.loadPackageDefinition(livechatDef).livechat;
 
 function chatLive(call) {
-  call.on('data', (chatRequest) => {
-    const msg = chatRequest.user_message;
-    console.log("📥 Received from client:", msg);
-
-    // Simulated response
-    const reply = {
-      bot_reply: `You said: "${msg}". How can I help further?`
-    };
-
-    call.write(reply); // Stream back the response
-  });
-
-  call.on('end', () => {
-    console.log("❌ Chat ended by client");
-    call.end();
-  });
-}
+    logData('LiveChat service started');
+  
+    const responses = [
+      'Hello! How can I help you today?',
+      'Just checking in — do you need help with your account?',
+      'Feel free to ask me anything.',
+      'Thanks for chatting with Nodeflix support!'
+    ];
+  
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < responses.length) {
+        const response = { bot_reply: responses[i] };
+        call.write(response);
+        logData(`LiveChat bot sent: ${responses[i]}`);
+        i++;
+      } else {
+        call.end();
+        clearInterval(interval);
+        logData('LiveChat session ended');
+      }
+    }, 1000);
+  }
+  
 
 function main() {
   const server = new grpc.Server();

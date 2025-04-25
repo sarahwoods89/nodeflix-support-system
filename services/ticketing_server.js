@@ -2,6 +2,17 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
+const fs = require('fs');
+
+// Function to log service events
+function logData(data) {
+  fs.appendFile('service.log', `${new Date().toISOString()} - ${data}\n`, (err) => {
+    if (err) {
+      console.error('Error writing to log:', err);
+    }
+  });
+}
+
 // Load ticketing.proto
 const ticketingProtoPath = path.join(__dirname, '..', 'proto', 'ticketing.proto');
 const ticketingDef = protoLoader.loadSync(ticketingProtoPath);
@@ -10,6 +21,8 @@ const ticketingProto = grpc.loadPackageDefinition(ticketingDef).ticketing;
 function createTicket(call) {
   const message = call.request.user_message;
   console.log("🎫 Ticket created for:", message);
+
+  logData(`Ticketing service received: ${message}`);
 
   const updates = [
     { status: "Ticket received", timestamp: new Date().toISOString() },
@@ -24,6 +37,8 @@ function createTicket(call) {
       call.write(updates[i]);
       i++;
     } else {
+      const ticketStatus = updates[updates.length - 1].status;
+      logData(`Ticket status sent: ${ticketStatus}`);    
       call.end();
       clearInterval(interval);
     }
