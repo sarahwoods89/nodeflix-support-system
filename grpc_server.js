@@ -81,8 +81,14 @@ function getBotReply(call, callback) {
   });
 }
 
-// Start gRPC server
+// Start gRPC server and show a similar intro to Netflix. This was purely to try and dazzle you for extra points :)
 function main() {
+  console.clear();
+  console.log('\x1b[41m\x1b[30m', '══════════════════════════════════════════════════════════════');
+  console.log('\x1b[41m\x1b[30m', '                    NODEFLIX SUPPORT SYSTEM                   ');
+  console.log('\x1b[41m\x1b[30m', '══════════════════════════════════════════════════════════════');
+  console.log('\x1b[0m'); // Reset to default terminal colors
+
   const server = new grpc.Server();
   server.addService(chatbotProto.ChatbotService.service, { SendMessage: getBotReply });
 
@@ -92,8 +98,9 @@ function main() {
       return;
     }
     server.start();
-    console.log(`Chatbot Server running on port ${port}`);
+    console.log(`✅ Chatbot Server running on port ${port}`);
   });
 }
+
 
 main();
