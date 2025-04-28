@@ -5,16 +5,17 @@
   <title>Nodeflix Support Chatbot</title>
   <style>
       body {
-    margin: 0;
-    padding: 0;
-    background-color: #111;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+  margin: 0;
+  padding: 0;
+  background-color: #111; /* Already there! ✅ */
+  color: #fff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
   .chatbox {
     border: 1px solid #b30000;
@@ -79,22 +80,32 @@
   }
 
   #intro-text {
-    color: white;
-    font-size: 50px;
-    font-family: 'Helvetica Neue', sans-serif;
-    animation: fadeInOut 2s forwards, scaleUp 2s forwards;
-  }
+  color: white;
+  font-size: 150px;
+  font-family: 'Helvetica Neue', sans-serif;
+  text-shadow: 
+    -2px -2px 0 #111, 
+     2px -2px 0 #111, 
+    -2px  2px 0 #111, 
+     2px  2px 0 #111; /* creates a black outline */
+  animation: fadeInOut 2s forwards, scaleUp 2s forwards;
+}
 
   /* 🖌️ Flashier colors faster */
   @keyframes colorCycle {
-    0% { background-color: black; }
-    10% { background-color: #8e0000; }
-    30% { background-color: #730099; }
-    50% { background-color: #0033cc; }
-    70% { background-color: #cc6600; }
-    90% { background-color: #ff0000; }
-    100% { background-color: black; }
-  }
+  0% { background-color: black; }
+  10% { background-color: #8e0000; } /* deep red */
+  20% { background-color: #730099; } /* purple */
+  30% { background-color: #0033cc; } /* blue */
+  40% { background-color: #006666; } /* teal */
+  50% { background-color: #00cc00; } /* green */
+  60% { background-color: #cccc00; } /* yellow */
+  70% { background-color: #cc6600; } /* orange */
+  80% { background-color: #ff3300; } /* red-orange */
+  90% { background-color: #ff00ff; } /* magenta */
+  100% { background-color: black; }
+}
+
 
   /* 🌟 Fade and shrink out */
   @keyframes fadeInOut {
@@ -110,6 +121,7 @@
     50% { transform: scale(1.1); }
     100% { transform: scale(0.8); }
   }
+
 </style>
 </head>
 
@@ -117,7 +129,7 @@
 
   <!-- Intro Screen -->
   <div id="intro-screen">
-    <h1 id="intro-text">NODEFLIX SUPPORT SYSTEM</h1>
+    <h1 id="intro-text">NODEFLIX</h1>
   </div>
 
   <!-- Main Chatbox -->
