@@ -48,7 +48,10 @@ function createTicket(call) {
 // Start gRPC server
 function main() {
   const server = new grpc.Server();
-  server.addService(ticketingProto.TicketingService.service, { CreateTicket: createTicket });
+  server.addService(ticketingProto.TicketingService.service, { 
+    CreateTicket: createTicket,   // <-- already there
+    SubmitMultipleComplaints: submitMultipleComplaints  // <-- new one you're adding
+  });  
 
   server.bindAsync('127.0.0.1:50053', grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {
@@ -58,6 +61,24 @@ function main() {
 
     server.start();
     console.log(`🟠 Ticketing Service running on port ${port}`);
+    function submitMultipleComplaints(call, callback) {
+      let allMessages = [];
+    
+      call.on('data', (ticketRequest) => {
+        console.log("📝 Received complaint:", ticketRequest.user_message);
+        allMessages.push(ticketRequest.user_message);
+      });
+    
+      call.on('end', () => {
+        console.log("✅ Finished receiving multiple complaints.");
+        const combinedSummary = `You submitted ${allMessages.length} complaints. Our team will review them: ${allMessages.join(' | ')}`;
+        callback(null, { summary: combinedSummary });
+      });
+    
+      call.on('error', (err) => {
+        console.error("❌ Error during client streaming:", err.message);
+      });
+    }    
   });
 }
 

@@ -3,7 +3,11 @@ syntax = "proto3";
 package ticketing;
 
 service TicketingService {
+  // ✅ Existing Server Streaming RPC (keep this)
   rpc CreateTicket (TicketRequest) returns (stream TicketUpdate);
+
+  // ✅ NEW Client Streaming RPC
+  rpc SubmitMultipleComplaints (stream TicketRequest) returns (TicketSummary);
 }
 
 message TicketRequest {
@@ -13,4 +17,8 @@ message TicketRequest {
 message TicketUpdate {
   string status = 1;   // e.g. "Ticket received", "Assigned to agent", etc.
   string timestamp = 2;
+}
+
+message TicketSummary {
+  string summary = 1;  // A final summary or response after all complaints
 }
