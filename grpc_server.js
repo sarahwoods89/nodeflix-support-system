@@ -61,24 +61,35 @@ function getBotReply(call, callback) {
     let reply = `Tone detected: ${tone}. `;
 
     if (tone === 'angry' || tone === 'frustrated') {
+      let timeoutFired = false;
+    
+      // Safety net: if no ticket end, still reply after 3s
+      const timeout = setTimeout(() => {
+        timeoutFired = true;
+        reply += ' [Timeout fallback] Your issue has been escalated.';
+        return callback(null, { bot_reply: reply });
+      }, 3000); // 3 seconds
+    
       ticketingClient.CreateTicket({ user_message: userMsg })
         .on('data', (ticketUpdate) => {
           console.log("📋 Ticket update:", ticketUpdate.status);
         })
         .on('end', () => {
-          reply += 'Your issue has been escalated. A support agent will contact you shortly.';
-          return callback(null, { bot_reply: reply });
+          if (!timeoutFired) {
+            clearTimeout(timeout);
+            reply += ' Your issue has been escalated. A support agent will contact you shortly.';
+            return callback(null, { bot_reply: reply });
+          }
         })
         .on('error', (err) => {
-          console.error('Ticketing stream error:', err.message);
-          reply += 'But I couldn’t create a ticket.';
-          return callback(null, { bot_reply: reply });
+          if (!timeoutFired) {
+            clearTimeout(timeout);
+            console.error('Ticketing stream error:', err.message);
+            reply += ' But I couldn’t create a ticket.';
+            return callback(null, { bot_reply: reply });
+          }
         });
-    } else {
-      reply += 'How can I assist you further?';
-      return callback(null, { bot_reply: reply });
-    }
-  });
+    }    
 }
 
 // Start gRPC server and show a similar intro to Netflix. This was purely to try and dazzle you for extra points :)
