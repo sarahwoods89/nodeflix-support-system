@@ -1,5 +1,5 @@
-//services/grpc_server.js
-// This is your main chatbot server now extended to talk to the sentiment and ticketing services.
+// services/grpc_server.js
+// Main chatbot server connecting to sentiment and ticketing services.
 
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
@@ -40,7 +40,7 @@ function getBotReply(call, callback) {
   const userMsg = call.request.user_message;
   console.log('Received from user:', userMsg);
 
-  // DEBUG LOGGING SENTIMENT CALL
+  // DEBUG
   console.log('Sending to sentiment service:', { message: userMsg });
 
   logData(`Chatbot received message: ${userMsg}`);
@@ -51,7 +51,6 @@ function getBotReply(call, callback) {
       return callback(null, { bot_reply: 'Sorry, I couldn’t analyze the message tone.' });
     }
 
-    // DEBUG LOGGING SENTIMENT RESPONSE
     console.log('Response from sentiment service:', response);
 
     const tone = response.tone;
@@ -62,12 +61,12 @@ function getBotReply(call, callback) {
     if (tone === 'angry' || tone === 'frustrated') {
       let timeoutFired = false;
 
-      // Safety net: if no ticket end, still reply after 3s
+      // Safety net timeout
       const timeout = setTimeout(() => {
         timeoutFired = true;
         reply += ' [Timeout fallback] Your issue has been escalated.';
         return callback(null, { bot_reply: reply });
-      }, 3000); // 3 seconds
+      }, 3000);
 
       ticketingClient.CreateTicket({ user_message: userMsg })
         .on('data', (ticketUpdate) => {
@@ -88,6 +87,7 @@ function getBotReply(call, callback) {
             return callback(null, { bot_reply: reply });
           }
         });
+
     } else {
       // Neutral or happy tone
       reply += 'How can I assist you further?';
@@ -96,13 +96,13 @@ function getBotReply(call, callback) {
   });
 }
 
-// Start gRPC server and show a similar intro to Netflix. This was purely to try and dazzle you for extra points :)
+// Start gRPC server
 function main() {
   console.clear();
   console.log('\x1b[41m\x1b[30m', '══════════════════════════════════════════════════════════════');
   console.log('\x1b[41m\x1b[30m', '                    NODEFLIX SUPPORT SYSTEM                   ');
   console.log('\x1b[41m\x1b[30m', '══════════════════════════════════════════════════════════════');
-  console.log('\x1b[0m'); // Reset to default terminal colors
+  console.log('\x1b[0m'); // Reset colors
 
   const server = new grpc.Server();
   server.addService(chatbotProto.ChatbotService.service, { SendMessage: getBotReply });
