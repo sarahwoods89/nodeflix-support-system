@@ -4,7 +4,6 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
-
 const fs = require('fs');
 
 // Function to log service events
@@ -62,14 +61,14 @@ function getBotReply(call, callback) {
 
     if (tone === 'angry' || tone === 'frustrated') {
       let timeoutFired = false;
-    
+
       // Safety net: if no ticket end, still reply after 3s
       const timeout = setTimeout(() => {
         timeoutFired = true;
         reply += ' [Timeout fallback] Your issue has been escalated.';
         return callback(null, { bot_reply: reply });
       }, 3000); // 3 seconds
-    
+
       ticketingClient.CreateTicket({ user_message: userMsg })
         .on('data', (ticketUpdate) => {
           console.log("📋 Ticket update:", ticketUpdate.status);
@@ -89,7 +88,12 @@ function getBotReply(call, callback) {
             return callback(null, { bot_reply: reply });
           }
         });
-    }    
+    } else {
+      // Neutral or happy tone
+      reply += 'How can I assist you further?';
+      return callback(null, { bot_reply: reply });
+    }
+  });
 }
 
 // Start gRPC server and show a similar intro to Netflix. This was purely to try and dazzle you for extra points :)
@@ -112,6 +116,5 @@ function main() {
     console.log(`✅ Chatbot Server running on port ${port}`);
   });
 }
-
 
 main();
