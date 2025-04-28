@@ -21,21 +21,21 @@ const sentimentProto = grpc.loadPackageDefinition(sentimentDef).sentiment;
 
 // Simulated tone analyzer
 function analyzeTone(call, callback) {
-  const msg = call.request.message.toLowerCase();
+  const msg = (call.request.message || "").toLowerCase();
   let tone = "neutral";
 
   logData(`Sentiment service received: ${msg}`);
 
-  if (msg.includes("angry") || msg.includes("refund") || msg.includes("not happy")) {
+  if (msg.includes("angry") || msg.includes("refund") || msg.includes("not happy") || msg.includes("annoyed") || msg.includes("mad") || msg.includes("upset")) {
     tone = "angry";
-  } else if (msg.includes("thanks") || msg.includes("great")) {
+  } else if (msg.includes("thanks") || msg.includes("great") || msg.includes("awesome") || msg.includes("good service")) {
     tone = "happy";
   }
 
   logData(`Tone determined: ${tone}`);
-
   console.log("✅ Received for tone analysis:", msg);
-  callback(null, { tone });
+  
+  callback(null, { tone }); // 👈 make sure to send the tone properly
 }
 
 // Start gRPC server

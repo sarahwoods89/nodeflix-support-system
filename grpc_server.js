@@ -37,11 +37,8 @@ const ticketingClient = new ticketingProto.TicketingService('localhost:50053', g
 
 // Chatbot logic
 function getBotReply(call, callback) {
-  const userMsg = call.request.user_message;
+  const userMsg = call.request.user_message || "";
   console.log('Received from user:', userMsg);
-
-  // DEBUG
-  console.log('Sending to sentiment service:', { message: userMsg });
 
   logData(`Chatbot received message: ${userMsg}`);
 
@@ -51,9 +48,7 @@ function getBotReply(call, callback) {
       return callback(null, { bot_reply: 'Sorry, I couldn’t analyze the message tone.' });
     }
 
-    console.log('Response from sentiment service:', response);
-
-    const tone = response.tone;
+    const tone = response.tone || "neutral";  // Fallback if somehow empty
     console.log('Detected tone:', tone);
 
     let reply = `Tone detected: ${tone}. `;
@@ -61,7 +56,6 @@ function getBotReply(call, callback) {
     if (tone === 'angry' || tone === 'frustrated') {
       let timeoutFired = false;
 
-      // Safety net timeout
       const timeout = setTimeout(() => {
         timeoutFired = true;
         reply += ' [Timeout fallback] Your issue has been escalated.';
@@ -89,12 +83,13 @@ function getBotReply(call, callback) {
         });
 
     } else {
-      // Neutral or happy tone
+      // For neutral or happy tones
       reply += 'How can I assist you further?';
       return callback(null, { bot_reply: reply });
     }
   });
 }
+
 
 // Start gRPC server
 function main() {
