@@ -3,10 +3,10 @@ syntax = "proto3";
 package ticketing;
 
 service TicketingService {
-  // ✅ Existing Server Streaming RPC (keep this)
+  // Existing Server Streaming RPC (keep this)
   rpc CreateTicket (TicketRequest) returns (stream TicketUpdate);
 
-  // ✅ NEW Client Streaming RPC
+  // NEW Client Streaming RPC
   rpc SubmitMultipleComplaints (stream TicketRequest) returns (TicketSummary);
 }
 

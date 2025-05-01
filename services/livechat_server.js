@@ -49,11 +49,11 @@ function main() {
 
   server.bindAsync('127.0.0.1:50054', grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {
-      console.error("❌ Failed to bind LiveChatService:", err);
+      console.error("Failed to bind LiveChatService:", err);
       return;
     }
     server.start();
-    console.log(`🎧 LiveChatService running on port ${port}`);
+    console.log(`LiveChatService running on port ${port}`);
   });
 }
 
