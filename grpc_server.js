@@ -46,11 +46,12 @@ function getBotReply(call, callback) {
   console.log('Received from user:', userMsg);
 
   logData(`Chatbot received message: ${userMsg}`);
-  //this is where we ask the sentiment server to analyse the tone of the message the chatbot server has received. 
+  //this is an error handling mechanisim where the chatbot server, for whatever reason, cannot access the sentiment server to
+  //analyse the tone. the chatbot can still offer the customer a response back. 
   sentimentClient.AnalyzeTone({ message: userMsg }, (err, response) => {
     if (err) {
       console.error('Error contacting Sentiment Service:', err.message);
-      return callback(null, { bot_reply: 'Sorry, I couldn’t analyze the message tone.' });
+      return callback(null, { bot_reply: 'Sorry, I am having trouble understanding your message. A support agent will be with you shortly' });
     }
 
     const tone = response.tone || "neutral";  // Fallback if empty.
@@ -60,7 +61,7 @@ function getBotReply(call, callback) {
     //create a ticekt to escalate the issue.
     if (tone === 'angry' || tone === 'frustrated') {
       let timeoutFired = false;
-      //Create a fallback if the ticekt creation laggs, that the chatbot server isn't affected.
+      //Create a fallback if the ticket creation laggs, that the chatbot server isn't affected.
       const timeout = setTimeout(() => {
         timeoutFired = true;
         reply += ' [Timeout fallback] Your issue has been escalated.';
@@ -82,7 +83,7 @@ function getBotReply(call, callback) {
           if (!timeoutFired) {
             clearTimeout(timeout);
             console.error('Ticketing stream error:', err.message);
-            reply += ' But I couldn’t create a ticket.';
+            reply += ' We are so sorry. We are having difficulty in creating a ticket for you. A member of our team will be touch with you shortly';
             return callback(null, { bot_reply: reply });
           }
         });
